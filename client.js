@@ -33,11 +33,13 @@ function connectSocket() {
   console.timeEnd('timer');
   console.log('Send a hello message...');
   console.log(`Socket is actually: ${socket.connected ? 'Connected' : 'Disconnected'}`);
-  
+
   //The unworking part
   //-------HERE
-  if (socket.connected)
+  if (socket.connected) {
+    console.log('-emit hello msg');
     socket.emit('hello');
+  }
   else {
     console.log('the socket is actually disconnected :/');
     socket.close();
