@@ -29,15 +29,18 @@ function connectSocket() {
   console.log(`Echo ${NBR_POSSIBILITES_TO_ECHO} possibilities and send an hello msg...`)
   console.log('Doing some SyncTask that take a while, this will kill the socket connection, (you should manage to make the sync task perform at least 60 sec in a row)');
   console.time('timer');
-  let res = execSync(`for /L %i in (1, 1, ${NBR_POSSIBILITES_TO_ECHO}) do echo %i`, { stdio: 'ignore', stderr: 'ignore' });
+  execSync(`for /L %i in (1, 1, ${NBR_POSSIBILITES_TO_ECHO}) do echo %i`, { stdio: 'ignore', stderr: 'ignore' });
   console.timeEnd('timer');
   console.log('Send a hello message...');
   console.log(`Socket is actually: ${socket.connected ? 'Connected' : 'Disconnected'}`);
-  //The questionnable part
+  
+  //The unworking part
+  //-------HERE
   if (socket.connected)
     socket.emit('hello');
   else {
     console.log('the socket is actually disconnected :/');
     socket.close();
   }
+  //-------TOHERE
 })();
