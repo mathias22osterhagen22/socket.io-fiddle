@@ -1,14 +1,44 @@
 
-const socket = require('socket.io-client')('http://localhost:3000');
+const socketio = require('socket.io-client');
+const { execSync } = require('child_process');
 
-socket.on('connect', () => {
-  console.log(`connect ${socket.id}`);
-});
+const NBR_POSSIBILITES_TO_ECHO = 1000000; //NOTE: Change this to adapt the cmd script to perform his task in at least 60 sec
 
-socket.on('disconnect', () => {
-  console.log(`disconnect ${socket.id}`);
-});
+function connectSocket() {
+  return new Promise((resolve, reject) => {
+    let socket = socketio('http://localhost:3001');
+    socket.on('connect', () => {
+      console.log(`===== connected ${socket.id}`);
 
-socket.on('hello', (a, b, c) => {
-  console.log(a, b, c);
-});
+      socket.once('hello', (a, b, c) => {
+        console.log('I RECEIVE AN HELLO MESSAGE ! YOUHOU !')
+        console.log(a, b, c);
+        socket.close();
+      });
+      resolve(socket);
+    });
+    socket.on('disconnect', () => {
+      console.log(` ==/==disconnect ${socket.id}`);
+    });
+  });
+}
+
+(async () => {
+  let socket = await connectSocket();
+  console.log(`Socket is actually: ${socket.connected ? 'Connected' : 'Disconnected'}`);
+  console.log(`Echo ${NBR_POSSIBILITES_TO_ECHO} possibilities and send an hello msg...`)
+  console.log('Doing some SyncTask that take some while, this will kill the socket connection, (you should manage to make the socket wait at least 60 sec)');
+  console.time('timer');
+  let res = execSync(`for /L %i in (1, 1, ${NBR_POSSIBILITES_TO_ECHO}) do echo %i`, { stdio: 'ignore', stderr: 'ignore' });
+  console.timeEnd('timer');
+  console.log(new String(res));
+  console.log('Send a hello message...');
+  console.log(socket.connected);
+  //The questionnable part
+  if (socket.connected)
+    socket.emit('hello');
+  else {
+    console.log('the socket is actually disconnected :/');
+    socket.close();
+  }
+})();
