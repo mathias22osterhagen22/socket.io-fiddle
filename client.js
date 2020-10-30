@@ -27,13 +27,12 @@ function connectSocket() {
   let socket = await connectSocket();
   console.log(`Socket is actually: ${socket.connected ? 'Connected' : 'Disconnected'}`);
   console.log(`Echo ${NBR_POSSIBILITES_TO_ECHO} possibilities and send an hello msg...`)
-  console.log('Doing some SyncTask that take some while, this will kill the socket connection, (you should manage to make the socket wait at least 60 sec)');
+  console.log('Doing some SyncTask that take a while, this will kill the socket connection, (you should manage to make the socket wait at least 60 sec)');
   console.time('timer');
   let res = execSync(`for /L %i in (1, 1, ${NBR_POSSIBILITES_TO_ECHO}) do echo %i`, { stdio: 'ignore', stderr: 'ignore' });
   console.timeEnd('timer');
-  console.log(new String(res));
   console.log('Send a hello message...');
-  console.log(socket.connected);
+  console.log(`Socket is actually: ${socket.connected ? 'Connected' : 'Disconnected'}`);
   //The questionnable part
   if (socket.connected)
     socket.emit('hello');
